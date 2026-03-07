@@ -104,7 +104,7 @@
 
     <div id="controls">
         <button id="fold">Fold</button>
-        <button id="call">Call</button>
+        <button id="call">Check</button>
         <button id="raise">Raise</button>
 
         <div id="slider-area">
@@ -304,7 +304,7 @@ function playerCall() {
 }
 
 function playerRaise(amount) {
-    let total = toCall + amount;
+    let total = amount;
     total = Math.min(total, playerChips);
 
     playerChips -= total;
@@ -395,18 +395,33 @@ function startHand() {
 
 /* ------------------ BUTTONS ------------------ */
 document.getElementById("fold").onclick = ()=>{ if(playerTurn) playerFold(); };
-document.getElementById("call").onclick = ()=>{ if(playerTurn) playerCall(); };
 
-document.getElementById("raise").onclick = ()=>{
+document.getElementById("call").onclick = () => {
     if (!playerTurn) return;
-    let minRaise = Math.max(20, toCall + 20);
-    let maxRaise = playerChips;
 
-    document.getElementById("slider-area").style.display = "block";
-    let slider = document.getElementById("bet-slider");
+    if (toCall === 0) {
+        status("You check.");
+        playerTurn = false;
+        setTimeout(aiAction, 800);
+    } else {
+        playerCall();
+    }
+};
+
+document.getElementById("raise").onclick = () => {
+    if (!playerTurn) return;
+
+    let minRaise = toCall === 0 ? 20 : toCall + 20;
+    let maxRaise = Math.max(minRaise, playerChips);
+
+    const sliderArea = document.getElementById("slider-area");
+    const slider = document.getElementById("bet-slider");
+
+    sliderArea.style.display = "block";
     slider.min = minRaise;
     slider.max = maxRaise;
     slider.value = minRaise;
+
     document.getElementById("slider-value").textContent = "Bet: " + minRaise;
 };
 
