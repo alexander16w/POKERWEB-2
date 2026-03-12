@@ -228,6 +228,16 @@ function compare(a,b) {
 function aiDecision() {
     let strength = best7([...ai, ...board])[0];
 
+    // Preflop logic: AI should not fold instantly
+    if (phase === "preflop") {
+        if (toCall > 0) {
+            if (strength >= 2) return "call";
+            return Math.random() < 0.8 ? "call" : "fold";
+        }
+        return "check";
+    }
+
+    // Postflop logic
     if (toCall > 0) {
         if (strength >= 4) return "raise";
         if (strength >= 2) return "call";
@@ -304,8 +314,7 @@ function playerCall() {
 }
 
 function playerRaise(amount) {
-    let total = amount;
-    total = Math.min(total, playerChips);
+    let total = Math.min(amount, playerChips);
 
     playerChips -= total;
     pot += total;
